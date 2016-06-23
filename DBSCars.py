@@ -1,4 +1,10 @@
-## Define Car object
+#### Name: Eilish Murphy
+#### Number: 10190433
+#### CA2 - DBS Car Rental Program
+
+### DBSCars.py: Create Car Class and PetrolCar, DieselCar, ElectricCar & HybridCar Objects
+
+## Define Car class
 class Car(object):
     
     def __init__(self):
