@@ -36,7 +36,7 @@ class Dealership(object):
         
     def rent(self, car_list, required):
         if len(car_list) < required:
-            print '\nThere is not enough cars in stock to fulfil rental\n'
+            print '\nThere are not enough cars in stock to fulfil rental\n'
             self.stock_count()
         else:
             count = 0
@@ -44,7 +44,7 @@ class Dealership(object):
                 car_list.pop()
                 count = count + 1
                 
-            print 'You have sucessfully rented %d cars' %required
+            print 'You have sucessfully rented %d \n' %required
         
     def restock(self, car_list, returned, Car):
         for i in range(returned):
@@ -53,7 +53,19 @@ class Dealership(object):
     ## deal with trying to return to many cars!    
         
         
-        
+    def select_car_type(self):
+        while True:
+            car_type = str.lower(raw_input("Please type\n'p' for a Petrol Car\n'd' for a Diesel Car\n'e' for an Electric Car\n'h' for a Hybrid Car:\n'n' for None and to exit\n> "))
+            if car_type == 'n':
+                print 'Goodbye'
+                quit()
+            if car_type == 'p' or car_type == 'd' or car_type == 'e' or car_type == 'h':
+                return car_type
+                break
+            else:
+                print "Selection must be 'p', 'd', 'e', 'h' or 'n', Try again"
+                continue
+            
         
         
 if __name__ == '__main__': 
@@ -71,11 +83,8 @@ if __name__ == '__main__':
         if mode == '1':
             while True:
                 print 'What type of car would you like?\n'
-                car_type = str.lower(raw_input("Please type\n'p' for a Petrol Car\n'd' for a Diesel Car\n'e' for an Electric Car\n'h' for a Hybrid Car:\n'n' for None and to exit\n> "))
                 
-                if car_type == 'n':
-                    print 'Goodbye'
-                    quit()
+                car_type = DBSRental.select_car_type()
                 
                 required = raw_input('How many cars would you like?\n> ')
                 try:
@@ -102,11 +111,8 @@ if __name__ == '__main__':
         elif mode == '2':  
             while True:
                 print 'What type of car are you returning?\n'
-                car_type = str.lower(raw_input("Please type\n'p' for a Petrol Car\n'd' for a Diesel Car\n'e' for an Electric Car\n'h' for a Hybrid Car:\n'n' for None and to exit\n> "))
                 
-                if car_type == 'n':
-                    print 'Goodbye'
-                    quit()
+                car_type = DBSRental.select_car_type()
                 
                 returned = raw_input('How many cars are you returning?\n> ')
                 try:
