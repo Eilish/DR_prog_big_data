@@ -5,6 +5,7 @@
 ###  Test_DBSRental.py: Test functionality of Dealership Object
 
 import unittest
+import mock
 
 from DBSRental import Dealership
 from DBSCars import Car, PetrolCar, DieselCar, ElectricCar, HybridCar
@@ -59,7 +60,7 @@ class TestDealership(unittest.TestCase):
     # test rent function when car stock is less than vehicles required
     # rent 50 cars from each type and check return = '\nThere are not enough cars in stock to fulfil rental\n'
     def test_rent_cars_not_available(self):
-        result = '\nThere are not enough cars in stock to fulfil rental\n'
+        result = '\nThere are not enough cars in stock to fulfil rental\n%s' % self.dealer.stock_count()
         self.assertEqual(result, self.dealer.rent(self.dealer.petrol_cars, 50))
         self.assertEqual(result, self.dealer.rent(self.dealer.diesel_cars, 50))
         self.assertEqual(result, self.dealer.rent(self.dealer.electric_cars, 50))
@@ -89,22 +90,23 @@ class TestDealership(unittest.TestCase):
         self.assertEqual(6, len(self.dealer.hybrid_cars))
         self.assertEqual(result, self.dealer.restock(self.dealer.hybrid_cars, 2, HybridCar))
 
+    # test get quantity function
+    def test_get_quantity(self):
+        with mock.patch('__builtin__.raw_input', return_value = '2'):
+            assert self.dealer.get_quantity() == 2
+        
+    # test select car type function returns correct car_type
+    def test_select_car_type(self):
+        with mock.patch('__builtin__.raw_input', return_value = 'p'):
+            assert self.dealer.select_car_type() == 'p'
+        with mock.patch('__builtin__.raw_input', return_value = 'd'):
+            assert self.dealer.select_car_type() == 'd'
+        with mock.patch('__builtin__.raw_input', return_value = 'e'):
+            assert self.dealer.select_car_type() == 'e'
+        with mock.patch('__builtin__.raw_input', return_value = 'h'):
+            assert self.dealer.select_car_type() == 'h'
+        
 
 
-
-
-
-
-    
-    # import mock
-
-# def test_say_hello():
-     # with mock.patch('__builtin__.raw_input', return_value='dbw'):
-         # assert say_hello() == 'Hello dbw'
-
-     # with mock.patch('__builtin__.raw_input', side_effect=['dbw', 'uki']):
-         # assert say_hello() == 'Hello dbw'
-         # assert say_hello() == 'Hello uki'    
-      
 if __name__ == '__main__':
     unittest.main()         

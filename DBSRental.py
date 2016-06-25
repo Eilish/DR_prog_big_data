@@ -34,7 +34,7 @@ class Dealership(object):
     # function to process rental 
     def rent(self, car_list, required):
         if len(car_list) < required:
-            return '\nThere are not enough cars in stock to fulfil rental\n' 
+            return '\nThere are not enough cars in stock to fulfil rental\n%s' %self.stock_count()
             
         else:
             count = 0
