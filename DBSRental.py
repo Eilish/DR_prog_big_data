@@ -4,10 +4,9 @@
 
 ### DBSRental.py: Create Dealership Class and User Interface
 
+from DBSCars import Car, PetrolCar, DieselCar, ElectricCar, HybridCar
 
-
-from DBSCars import PetrolCar, DieselCar, ElectricCar, HybridCar
-
+# Create Dealership Object
 class Dealership(object):
 
     def __init__(self):
@@ -16,6 +15,7 @@ class Dealership(object):
         self.electric_cars = []
         self.hybrid_cars = []
         
+    # function to create current stock
     def create_current_stock(self):
         for i in range(24):
            self.petrol_cars.append(PetrolCar())
@@ -26,6 +26,7 @@ class Dealership(object):
         for i in range(4):
            self.hybrid_cars.append(HybridCar())
 
+    # function to return current stock level
     def stock_count(self):
         print '\n\tCurrent Stock:'
         print '\t\t%d Petrol Cars' %len(self.petrol_cars)
@@ -34,6 +35,7 @@ class Dealership(object):
         print '\t\t%d Hybrid Cars' %len(self.hybrid_cars)
         
         
+    # function to process rental 
     def rent(self, car_list, required):
         if len(car_list) < required:
             print '\nThere are not enough cars in stock to fulfil rental\n'
@@ -44,15 +46,16 @@ class Dealership(object):
                 car_list.pop()
                 count = count + 1
                 
-            print 'You have sucessfully rented %d \n' %required
+            print 'You have sucessfully rented %d cars\n' %required
         
+    # function to return rented vehicle
     def restock(self, car_list, returned, Car):
         for i in range(returned):
             car_list.append(Car())
         print 'You have sucessfully returned %d cars' %returned    
-    ## deal with trying to return to many cars!    
+       
         
-        
+     # function to request car type from user
     def select_car_type(self):
         while True:
             car_type = str.lower(raw_input("Please type\n'p' for a Petrol Car\n'd' for a Diesel Car\n'e' for an Electric Car\n'h' for a Hybrid Car:\n'n' for None and to exit\n> "))
@@ -69,17 +72,22 @@ class Dealership(object):
         
         
 if __name__ == '__main__': 
+    
+    # set up DBS Rental and create current stock 
     DBSRental = Dealership()  
 
     DBSRental.create_current_stock()
     
     print 'Welcome to DBS Car Rental\n'
     
+    #get user to select rent/return mode
     while True:
         mode = raw_input("Would you like to rent or return a car?\n\nPlease type '1' to rent or '2' to return\nType 'q' to quit> ")
         if mode == 'q':
             print 'Goodbye'
             quit()
+        
+        # process rental
         if mode == '1':
             while True:
                 print 'What type of car would you like?\n'
@@ -95,19 +103,18 @@ if __name__ == '__main__':
                 if car_type == 'p':
                     DBSRental.rent(DBSRental.petrol_cars, required)
                     break
-                elif car_type == 'd':
+                if car_type == 'd':
                     DBSRental.rent(DBSRental.diesel_cars, required)
-                    print len(DBSRental.diesel_cars)
                     break
-                elif car_type == 'e':
+                if car_type == 'e':
                     DBSRental.rent(DBSRental.electric_cars, required)
                     break
-                elif car_type == 'h':
+                if car_type == 'h':
                     DBSRental.rent(DBSRental.hybrid_cars, required)
                     break
-                else:
-                    print "Selection must be 'p', 'd', 'e', 'h' or 'n', Try again"
-                    continue    
+                   
+        
+        #process return
         elif mode == '2':  
             while True:
                 print 'What type of car are you returning?\n'
@@ -121,23 +128,31 @@ if __name__ == '__main__':
                     continue
                 
                 if car_type == 'p':
-                    print 'yes'
-                    DBSRental.restock(DBSRental.petrol_cars, returned, DBSRental.PetrolCar())
-                    print len(petrol_cars)
+                    if (len(DBSRental.petrol_cars) + returned) > 24:
+                        print 'Please check type and quantity: exceeds max stock'
+                        continue
+                    DBSRental.restock(DBSRental.petrol_cars, returned, PetrolCar)
                     break
-                elif car_type == 'd':
-                    DBSRental.restock(DBSRental.diesel_cars, returned, DBSRental.DieselCar())
+                if car_type == 'd':
+                    if (len(DBSRental.diesel_cars) + returned) > 12:
+                        print 'Please check type and quantity: exceeds max stock'
+                        continue
+                    DBSRental.restock(DBSRental.diesel_cars, returned, DieselCar)
                     break
-                elif car_type == 'e':
-                    DBSRental.restock(DBSRental.electric_cars, returned, DBSRental.ElectricCar())
+                if car_type == 'e':
+                    if (len(DBSRental.electric_cars) + returned) > 4:
+                        print 'Please check type and quantity: exceeds max stock'
+                        continue
+                    DBSRental.restock(DBSRental.electric_cars, returned, ElectricCar)
                     break
-                elif car_type == 'h':
-                    DBSRental.restock(DBSRental.hybrid_cars, returned, DBSRental.HybridCar())
+                if car_type == 'h':
+                    if (len(DBSRental.hybrid_cars) + returned) > 4:
+                        print 'Please check type and quantity: exceeds max stock'
+                        continue
+                    DBSRental.restock(DBSRental.hybrid_cars, returned, HybridCar)
                     break
                 
-                else:
-                    print "Selection must be 'p', 'd', 'e', 'h' or 'n', Try again"
-                    continue    
+                    
         else:
             print 'You must select either 1, 2 or q'
             continue
