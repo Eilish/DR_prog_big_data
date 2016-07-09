@@ -2,94 +2,114 @@
 #### Number: 10190433
 #### CA3 - Analytics on Dataset
 
-# open and read in file
-file = "changes_python.txt"
-data = [line.strip() for line in open(file, 'r')]
+from collections import Counter 
 
-# count number of lines in file, there should be 5255 lines
-line_count = len(data)
+# read in file and count number of lines in file  
+file = 'changes_python.txt'
+data = [line.strip() for line in open(file, 'r')]
+line_count = len(data) #there should be 5255 lines 
 
 # count number of commits, there should be 422 , each commit is separated by a line of 72 '-'
-# line 1 of each commit is a headder line
+# line 1 of each commit is a header line
 # sample header line: r1551925 | viacheslav.vdovenko | 2015-11-27 16:57:44 +0000 (Fri, 27 Nov 2015) | 1 line
 # header line is followed by list of changes made - no of changes varies per commit
 # changes are followed by the user comment
 
+# Create Commit Class
+class Commit:
+    
+    def __init__(self, revision = None, author = None, time_stamp = None, date = None, time = None, lines_in_comment = None, paths_changed = None, comment = None):
+        self.revision = revision 
+        self.author = author
+        self.time_stamp = time_stamp
+        self.date = date
+        self.time = time
+        self.lines_in_comment = lines_in_comment
+        self.paths_changed = paths_changed
+        self.comment = comment
+    
+# define separator and starting index. create lists to hold different elements
 sep = '-'*72 
 index = 0 
-
 commits = []
-authors = {}
-dates = {}
-hours = {}
-
+revisions = []
+authors = []
+dates = []
+times = []
+lines_in_comments = []
+path_changes = []
+comments = []
+       
 # read through file and pull out required info and then move to next header line until end of file reached
 while True:
     try:
+        wip_commit = Commit()
+        
         # identify header liners and split on | and append to commits list
         header = data[index + 1].split(' | ') 
         commits.append(header)
         
-        # split header into separate elements
-        revision, author, date_time, comment_lines = header
-        
-        # sub-divide date/time into separate elements
-        date_time = date_time.split()
-        full_date, time, zone, day, day_no, month, year = date_time
-        # split time to identify hour
-        time = time.split(':')
-        hour = time[0]
+        # divide header items into individual elements and append to list
+        revision, author, time_stamp, lines_in_comment = header
+        date, time, zone, day, day_no, month, year = time_stamp.split()
+        lines_in_comment, line = lines_in_comment.split()
+        paths_changed = data[index +2 : data.index('', index+1)]
+                        
+        wip_commit.revision = revision.strip()
+        revisions.append(revision)
+        wip_commit.author = author.strip()
+        authors.append(author)
+        wip_commit.date = date.strip()
+        dates.append(date)
+        wip_commit.time = time.strip()
+        times.append(time)
+        wip_commit.lines_in_comment = int(lines_in_comment.strip())
+        lines_in_comments.append(lines_in_comment)
+        wip_commit.paths_changed = paths_changed
+        path_changes.append(paths_changed)
                 
-        # add authors and number of their commits to authors dictionary
-        authors[author] = authors.get(author, 0) +1
-        
-        # add dates and number of commits per day to date dictionary
-        dates[full_date] = dates.get(full_date, 0) +1
-        
-        # add hours and number of commits per hour to hours dictionary
-        hours[hour] = hours.get(hour, 0) +1        
-        
-        
+        # move to next index and append current comment to list (last line in current comment)
         index = data.index(sep, index + 1)
+        comment = data[index-wip_commit.lines_in_comment:index]
+        wip_commit.comment = comment
+        comments.append(comment)
+        
+        
     except IndexError:
         break
 
-# process authors dictionary to find author with most and least commits
-author_commits = []
-for key, value in authors.items():
-    author_commits.append((value, key))
-author_commits.sort(reverse = True)
-most, busy_author = author_commits[0]
-least, lazy_author = author_commits[-1] 
+dates.sort()
+times.sort()
 
-# process dates dictionary to find first and last date and day with most commits
-date_commits = []
-for key, value in dates.items():
-    date_commits.append((key, value))
-date_commits.sort()
-first, no1 = date_commits[0]
-last, no2 = date_commits[-1]
+# split changes made into type of change
+add = []
+modify = []
+delete = []
 
-busiest_day = []
-for key, value in dates.items():
-    busiest_day.append((value, key))
-busiest_day.sort(reverse = True)
-count, busy_day = busiest_day[0]
-    
- 
+for element in path_changes:
+    for item in element:
+        if item.startswith('A'):
+            add.append(item)
+        if item.startswith('M'):
+            modify.append(item)
+        if item.startswith('D'):
+            delete.append(item)
+
+# output details about file
+print 'File Details:' 
 print 'There are %d lines in the %s file' % (line_count, file)
 print 'There were %s commits made to the file' % len(commits)
-print 'There were ' + str(len(authors)) + ' authors who made changes.'
-print 'The author who made the most commits was %s with %d commits' % (busy_author, most)
-print 'The author who made the least commits was %s with %d commits' % (lazy_author, least)
-
-print 'Commits were made to the file between %s and %s' % (first, last)
-print 'The most commits were made on %s with %d commits' % (busy_day, count)
-
-# print 'The earliest commit was made at %s and the latest commit at %s' %(time[0], time[-1])
-
-
-
+print '\nAuthor Details:'
+print 'There were ' + str(len(Counter(authors))) + ' authors who made changes.'
+print 'The average number of commits per author was ' + str(len(revisions)/len(Counter(authors)))
+print 'The number of commits made by each author is:\n' , Counter(authors)
+print '\nDates & Times Details:'
+print 'Commits were made to the file between %s and %s' % (dates[0], dates[-1])
+print 'The earliest commit was made at %s and the latest commit made at %s' %(times[0], times[-1])
+print '\nChanges Details:'
+print 'There were ' + str(len(add)) + ' additions made to the file'
+print 'There were ' + str(len(modify)) + ' modifications made to the file'
+print 'There were ' + str(len(delete)) + ' deletions made to the file'
 
 
 
