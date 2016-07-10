@@ -28,7 +28,8 @@ class Commit:
         self.paths_changed = paths_changed
         self.comment = comment
     
-
+       
+    
 if __name__ == '__main__': ## Only run if program called from command line
     
     # define separator and starting index. create lists to hold different elements
@@ -84,14 +85,17 @@ if __name__ == '__main__': ## Only run if program called from command line
     mode_dates = Counter(dates)
     times.sort()
         
-    # split changes made into type of change
+    # split changes made into type of change and apend to individual lists
     add = []
     modify = []
     delete = []
-
+    
     [add.append(item)for element in path_changes for item in element if item.startswith('A')]
     [modify.append(item)for element in path_changes for item in element if item.startswith('M')]
     [delete.append(item)for element in path_changes for item in element if item.startswith('D')]
+    
+    # calculate total changes commited
+    total_changes = len(add) + len(modify) + len(delete)
     
     # output details about file
     print '\nFile Details:' 
@@ -99,16 +103,18 @@ if __name__ == '__main__': ## Only run if program called from command line
     print 'There were %s commits made to the file' % len(commits)
     print '\nAuthor Details:'
     print 'There were ' + str(len(Counter(authors))) + ' authors who made changes.'
-    print 'The mean number of commits per author was ' + str(len(revisions)/len(Counter(authors)))
+    print 'The mean number of commits per author was ' + str((float(len(revisions)))/len(Counter(authors)))
     print 'The number of commits made by each author is:\n' , Counter(authors)
     print '\nDates & Times Details:'
     print 'Commits were made to the file between %s and %s' % (dates[0], dates[-1])
     print 'The earliest commit was made at %s and the latest commit made at %s' %(times[0], times[-1])
     print 'The most commits were made on: '+ str(mode_dates.most_common(1))
     print '\nChanges Details:'
+    print 'There were %d changes made to the file' % total_changes
     print 'There were ' + str(len(add)) + ' additions made to the file'
     print 'There were ' + str(len(modify)) + ' modifications made to the file'
     print 'There were ' + str(len(delete)) + ' deletions made to the file'
+    print 'The mean changes per commit is: ' + str(total_changes/float(len(commits)))
 
 
 
