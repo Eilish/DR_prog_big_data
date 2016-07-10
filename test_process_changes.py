@@ -23,7 +23,9 @@ class TestProcessChanges(unittest.TestCase):
         self.process.header = data[index + 1].split(' | ')
         self.process.revision, self.process.author, self.process.time_stamp, self.process.lines_in_comment = self.process.header
         self.process.date, self.process.time, self.process.zone, self.process.day, self.process.day_no, self.process.month, self.process.year = self.process.time_stamp.split()
-        
+        self.process.add = []
+        self.process.modify = []
+        self.process.delete = []
         
     def test_header_elements(self):
         # test if header is dividing into correct elements and time_stamp is sub-dividing correctly
@@ -56,8 +58,24 @@ class TestProcessChanges(unittest.TestCase):
         self.assertEqual(result, len(self.process.dates))
         self.assertEqual(result, len(self.process.times))
         self.assertEqual(result, len(self.process.lines_in_comments))
-        
-        
+    
+    def test_path_changes_and_types(self):
+        sep =  '-'*72
+        index = 0
+        while True:
+            try:
+                self.process.header = data[index + 1].split(' | ')
+                self.process.paths_changed = data[index +2 : data.index('', index+1)]
+                self.process.path_changes.append(self.process.paths_changed)
+                index = data.index(sep, index + 1)
+            except IndexError:
+                break
+        [self.process.add.append(item)for element in self.process.path_changes for item in element if item.startswith('A')]
+        [self.process.modify.append(item)for element in self.process.path_changes for item in element if item.startswith('M')]
+        [self.process.delete.append(item)for element in self.process.path_changes for item in element if item.startswith('D')]
+        self.assertEqual(1056, len(self.process.add))
+        self.assertEqual(1186, len(self.process.modify))
+        self.assertEqual(767, len(self.process.delete))
         
 if __name__ == '__main__':
     unittest.main()
